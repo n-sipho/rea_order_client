@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Checkbox, Form, Input, Radio, TextArea, Button, Message } from 'semantic-ui-react';
-import Axios from 'axios';
+import api from '../../utils/api';
 
 class UpdateStockForm extends Component {
     constructor() {
@@ -32,7 +32,7 @@ class UpdateStockForm extends Component {
         try {
             const { qty, name, description, price } = this.state;
             const params = { qty, name, description, price };
-            await Axios.post('/api/rea_order/add/stock', params)
+            await api.post('/add/stock', params)
                 .then(res => {
                     this.setState({ message: res.data.status });
                 });

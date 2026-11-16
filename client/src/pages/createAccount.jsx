@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card, Button, Icon, Input, Popup } from 'semantic-ui-react';
 import { Redirect, Link } from 'react-router-dom';
-import Axios from 'axios';
+import api from '../utils/api';
 
 class CreateAccount extends React.Component {
     constructor() {
@@ -31,7 +31,7 @@ class CreateAccount extends React.Component {
             if (confirm_pass_code === pass_code) {
                 this.setState({ isMatch: false });
                 this.setState({ isLoading: true });
-                await Axios.post('/api/rea_order/create_account', params)
+                await api.post('/create_account', params)
                     .then(async res => {
                         console.log(res.data);
                         let results = res.data;

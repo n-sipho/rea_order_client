@@ -11,12 +11,12 @@ export default class MenuExampleInvertedSecondary extends Component {
     const { activeItem } = this.state;
     return (
       <div>
-        <Menu inverted secondary borderless pointing color='grey' stackable>
+        <Menu inverted secondary borderless pointing color='grey' stackable className='admin-topbar'>
           <Menu.Item name='home' active={activeItem === 'home'} onClick={this.handleItemClick}>
             <Icon name='home' color='black' size='large' />Admin
           </Menu.Item>
 
-          <Menu.Item position='right'><Input placeholder='Search...' /></Menu.Item>
+          <Menu.Item position='right' className='admin-topbar__search'><Input placeholder='Search...' /></Menu.Item>
 
           <Menu.Item position='right' name='logout' active={activeItem === 'logout'} onClick={this.handleItemClick}>
             <Icon name='log out' size='large' color='black' /> Logout

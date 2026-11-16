@@ -45,7 +45,31 @@ module.exports = (pool) => {
     }
 
     const getUserPlacedOrders = async (id) => {
-        let getOrders = await pool.query(`SELECT user_orders.my_orders, user_orders.id, stock.name, stock.item_description, user_orders.order_state, user_orders.is_done, user_orders.order_cost, user_orders.count FROM stock INNER JOIN user_orders ON stock.id = user_orders.orders_table WHERE user_orders.my_orders = ${id}`);
+        let getOrders = await pool.query(`
+            SELECT orders.id, orders.order_name AS name,
+                   orders.order_description AS item_description,
+                   'Pending'::text AS order_state, orders.is_done,
+                   orders.order_cost, orders.count, orders.TIMESTAMP AS time_stamp
+            FROM orders
+            WHERE orders.whos_order = $1
+              AND NOT EXISTS (
+                  SELECT 1
+                  FROM user_orders
+                  WHERE user_orders.orders_table = orders.order_id
+                    AND user_orders.my_orders = orders.whos_order
+                    AND user_orders.order_cost = orders.order_cost
+                    AND user_orders.count = orders.count
+                    AND user_orders.time_stamp = orders.TIMESTAMP
+              )
+            UNION ALL
+            SELECT user_orders.id, stock.name, stock.item_description,
+                   user_orders.order_state, user_orders.is_done,
+                   user_orders.order_cost, user_orders.count, user_orders.time_stamp
+            FROM stock
+            INNER JOIN user_orders ON stock.id = user_orders.orders_table
+            WHERE user_orders.my_orders = $1
+            ORDER BY time_stamp DESC
+        `, [id]);
         return getOrders.rows;
     }
 
@@ -131,6 +155,44 @@ module.exports = (pool) => {
         return accounts;
     }
 
+    const getOrCreateDemoUser = async (createPasswordHash) => {
+        const client = await pool.connect();
+        const email = 'demo-user@rea-order.invalid';
+
+        try {
+            await client.query('BEGIN');
+            await client.query('SELECT pg_advisory_xact_lock(hashtext($1))', [email]);
+
+            const existing = await client.query(
+                'SELECT id, is_admin FROM users WHERE email = $1 ORDER BY id LIMIT 1',
+                [email]
+            );
+            if (existing.rows.length > 0) {
+                if (existing.rows[0].is_admin) {
+                    throw new Error('Configured demo account must not be an admin');
+                }
+                await client.query('COMMIT');
+                return existing.rows[0].id;
+            }
+
+            const passwordHash = await createPasswordHash();
+            const result = await client.query(
+                `INSERT INTO users
+                    (name, last_name, email, phone_number, home_address, user_password, is_admin, verified)
+                 VALUES ($1, $2, $3, $4, $5, $6, false, false)
+                 RETURNING id`,
+                ['Demo', 'Tester', email, '', '', passwordHash]
+            );
+            await client.query('COMMIT');
+            return result.rows[0].id;
+        } catch (error) {
+            await client.query('ROLLBACK');
+            throw error;
+        } finally {
+            client.release();
+        }
+    }
+
     const signIn = async (input_email) => {
         let check = await pool.query(`SELECT email, user_password, id FROM users WHERE email = $1`, [input_email]);
         console.log(check.rows);
@@ -172,6 +234,7 @@ module.exports = (pool) => {
         getActiveOrders,
         getReadyOrder,
         createAccount,
+        getOrCreateDemoUser,
         signIn,
         getUser,
         getAllusers,

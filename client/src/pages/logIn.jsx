@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card, Button, Icon, Input, Label, Container } from 'semantic-ui-react';
 import { Redirect, Link } from 'react-router-dom';
-import Axios from 'axios';
+import api from '../utils/api';
 import Auth from '../utils/Auth';
 
 class Login extends React.Component {
@@ -13,6 +13,8 @@ class Login extends React.Component {
             redirect: false,
             isLoading: false,
             no_input: false,
+            isDemoLoading: false,
+            demoError: '',
         }
     }
 
@@ -27,7 +29,7 @@ class Login extends React.Component {
                 this.setState({ no_input: true });
             } else {
                 this.setState({ no_input: false });
-                await Axios.post('/api/rea_order/login', params)
+                await api.post('/login', params)
                     .then(async res => {
                         if (res.data.status === 'Account doesnt exist') {
                             console.log(res.data.status);
@@ -45,6 +47,26 @@ class Login extends React.Component {
             };
         } catch (error) {
 
+        }
+    }
+
+    handleDemoLogin = async () => {
+        this.setState({ isDemoLoading: true, demoError: '' });
+        try {
+            const response = await api.post('/demo-login');
+            window.localStorage.setItem('token', response.data.token);
+            await Auth.check();
+            if (!Auth.getAuth()) {
+                throw new Error('Demo authentication failed.');
+            }
+            this.setState({ redirect: true });
+        } catch (error) {
+            window.localStorage.removeItem('token');
+            this.setState({
+                demoError: error.response?.data?.message || 'Unable to start the demo. Please try again later.'
+            });
+        } finally {
+            this.setState({ isDemoLoading: false });
         }
     }
 
@@ -75,7 +97,7 @@ class Login extends React.Component {
     }
 
     renderLogin = () => {
-        const { isLoading, no_input } = this.state;
+        const { isLoading, isDemoLoading, no_input, demoError } = this.state;
         let label;
         if (no_input) {
             label = <Label basic pointing prompt color='red'>
@@ -97,6 +119,17 @@ class Login extends React.Component {
                                 <div style={{ paddingLeft: 40 }}>
                                     <Button content='Login' circular color='teal' type='submit' onClick={this.handleLogin} loading={isLoading} />
                                 </div>
+                                {demoError && <Label basic color='red'>{demoError}</Label>}
+                                <div className='gr'></div>
+                                <Button
+                                    fluid
+                                    basic
+                                    color='teal'
+                                    content='Continue as demo'
+                                    onClick={this.handleDemoLogin}
+                                    loading={isDemoLoading}
+                                    disabled={isLoading}
+                                />
                             </Card.Description>
                         </Card.Content>
                         <Card.Content extra>

@@ -68,3 +68,13 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 ### `npm run build` fails to minify
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify) -->
+
+## Production demo access
+
+Set `DEMO_MODE=true` on the backend to enable the login page's **Continue as demo** button. The backend provisions a dedicated non-admin demo user on first use; no demo password is exposed. Disable the feature by removing the variable or setting it to `false`.
+
+Demo sessions share the same demo account and its orders. Use a separate test database for public demos rather than connecting this feature to real customer data.
+
+## Neon Postgres
+
+The backend loads `DATABASE_URL` from the ignored `.env.local` file for local development. Run `neon deploy` to reconcile the linked branch policy and refresh Neon environment variables. In hosting, set `DATABASE_URL` as a platform environment variable instead of uploading `.env.local`.

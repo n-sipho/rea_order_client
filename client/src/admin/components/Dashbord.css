@@ -1,0 +1,170 @@
+.admin-topbar.ui.menu {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.admin-topbar__search .ui.input {
+    width: min(16rem, 32vw);
+}
+
+.admin-dashboard {
+    box-sizing: border-box;
+    display: grid;
+    grid-template-columns: minmax(12rem, 15rem) minmax(0, 1fr);
+    align-items: start;
+    gap: 1.5rem;
+    width: 100%;
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 1.5rem clamp(1rem, 2vw, 2rem);
+}
+
+.admin-dashboard__sidebar {
+    min-width: 0;
+}
+
+.admin-dashboard__menu-toggle,
+.admin-dashboard__menu-close,
+.admin-dashboard__backdrop {
+    display: none;
+}
+
+.admin-dashboard__menu.ui.menu {
+    width: 100%;
+    margin: 0;
+}
+
+.admin-dashboard__main {
+    min-width: 0;
+}
+
+.admin-dashboard__header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-bottom: 1rem;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid rgba(34, 36, 38, .15);
+}
+
+.admin-dashboard__title {
+    margin: 0;
+    color: rgb(117, 117, 117);
+    font-size: clamp(1.75rem, 4vw, 2.5rem);
+    font-weight: 300;
+}
+
+.admin-dashboard__section-title {
+    margin: 0 0 1rem;
+    color: rgb(117, 117, 117);
+    font-size: clamp(1.35rem, 3vw, 1.875rem);
+    font-weight: 300;
+}
+
+.admin-dashboard__content {
+    min-width: 0;
+    max-width: 100%;
+    overflow-x: auto;
+}
+
+.admin-dashboard__content .ui.table {
+    margin: 0;
+}
+
+.admin-dashboard__content .ui.table td {
+    overflow-wrap: anywhere;
+}
+
+.admin-orders-list {
+    max-height: min(60vh, 36rem);
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+@media (max-width: 767px) {
+    .admin-dashboard {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 1rem;
+        padding: 1rem;
+    }
+
+    .admin-dashboard__sidebar {
+        position: fixed;
+        z-index: 1001;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        width: min(20rem, 85vw);
+        padding: 1rem;
+        overflow-y: auto;
+        background: #fff;
+        box-shadow: 0 0 1.5rem rgba(0, 0, 0, .2);
+        transform: translateX(-105%);
+        visibility: hidden;
+        transition: transform .2s ease, visibility 0s linear .2s;
+    }
+
+    .admin-dashboard__sidebar.is-open {
+        transform: translateX(0);
+        visibility: visible;
+        transition-delay: 0s;
+    }
+
+    .admin-dashboard__menu-toggle {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 2.75rem;
+        height: 2.75rem;
+        padding: 0;
+        border: 0;
+        border-radius: .25rem;
+        background: transparent;
+        color: #333;
+        font-size: 1.25rem;
+        cursor: pointer;
+    }
+
+    .admin-dashboard__menu-close {
+        display: inline-flex;
+        align-items: center;
+        gap: .5rem;
+        padding: .5rem 0 1rem;
+        border: 0;
+        background: transparent;
+        color: #333;
+        font: inherit;
+        cursor: pointer;
+    }
+
+    .admin-dashboard__menu.ui.vertical.menu {
+        width: 100%;
+        margin: 0;
+    }
+
+    .admin-dashboard__backdrop {
+        display: block;
+        position: fixed;
+        z-index: 1000;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        border: 0;
+        background: rgba(0, 0, 0, .4);
+    }
+}
+
+@media (max-width: 600px) {
+    .admin-topbar .admin-topbar__search {
+        order: 3;
+        flex: 1 0 100%;
+        margin-left: 0 !important;
+    }
+
+    .admin-topbar__search .ui.input {
+        width: 100%;
+    }
+}

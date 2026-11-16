@@ -1,7 +1,8 @@
 import { Component } from 'react';
 import socketIOClient from 'socket.io-client';
+import { BACKEND_URL } from '../utils/api';
 
-const socket = socketIOClient();
+const socket = socketIOClient(BACKEND_URL);
 class SocketConnection extends Component {
     constructor() {
         super();

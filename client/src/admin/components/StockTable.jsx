@@ -1,6 +1,6 @@
 import React from 'react';
 import { Icon, Table } from 'semantic-ui-react';
-import Axios from 'axios';
+import api from '../../utils/api';
 
 class StockTable extends React.Component {
     constructor() {
@@ -12,7 +12,7 @@ class StockTable extends React.Component {
 
     async componentDidMount() {
         try {
-            await Axios.get('/api/rea_order/all')
+            await api.get('/all')
                 .then(res => {
                     if (res.data.isTrue) {
                         this.setState({ stock: res.data.data });

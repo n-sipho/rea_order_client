@@ -1,6 +1,6 @@
 import React from 'react';
 import { Icon, Table, Checkbox } from 'semantic-ui-react';
-import Axios from 'axios';
+import api from '../../utils/api';
 
 class ClientTable extends React.Component {
     constructor() {
@@ -12,7 +12,7 @@ class ClientTable extends React.Component {
 
     async componentDidMount() {
         try {
-            await Axios.get('/api/rea_order/users/data')
+            await api.get('/users/data')
                 .then(async res => {
                     if (res.data.isTrue) {
                         this.setState({ users: await res.data.data });

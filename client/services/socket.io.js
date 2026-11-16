@@ -3,20 +3,21 @@ module.exports = (io, dbQueries) => {
     io.on("connection", async socket => {
         socket.on('ordered_data', async () => {
             let data = await dbQueries.getPlacedOrders();
-            io.sockets.emit('get_data', data);
+            socket.emit('get_data', data);
         });
 
         // listening for new orders placed
         socket.on('add order', async order => {
-            order.forEach(async item => {
+            for (const item of order) {
                 let { id, name, description, price, count, user_id } = item;
                 const isDone = false;
                 const time_stamp = new Date();
                 await dbQueries.placeOrder(id, name, description, price, count, isDone, user_id, time_stamp);
                 await dbQueries.updateStockQty(id, count);
-                io.sockets.emit('change_data');
-            });
+            }
 
+            io.sockets.emit('change_data');
+            io.sockets.emit('data');
         });
 
         // sending info about the order that it has been accepted and busy preparing.
@@ -35,8 +36,8 @@ module.exports = (io, dbQueries) => {
 
         // emiting all the user orders
         socket.on('get orders', async () => {
-            io.sockets.emit('data');
-            io.sockets.emit('past orders');
+            socket.emit('data');
+            socket.emit('past orders');
         });
 
         // saving the order after it has been finished

@@ -1,3 +1,5 @@
+require('dotenv').config({ path: '.env.local' });
+
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
@@ -14,13 +16,13 @@ const app = express();
 
 
 const { Pool } = pg;
-const local = process.env.LOCAL || false;
-if (process.env.DATABASE_URL && !local) {
-    useSSL = true;
-}
-
-const connectionString = process.env.DATABASE_URL || "postgresql://diction:root@localhost:5432/rea_order";
-const pool = new Pool({ connectionString, ssl: { rejectUnauthorized: false } });
+const local = process.env.LOCAL === 'true';
+const connectionString = process.env.DATABASE_URL || "postgresql://admin:root@localhost:5434/rea_order";
+const useSSL = Boolean(process.env.DATABASE_URL) && !local;
+const pool = new Pool({
+    connectionString,
+    ssl: useSSL ? { rejectUnauthorized: false } : false
+});
 
 
 
@@ -46,6 +48,7 @@ app.get('/api/rea_order/all', rea_order.get);
 app.post('/api/rea_order/get_order', rea_order.order);
 app.post('/api/rea_order/create_account', rea_order.create);
 app.post('/api/rea_order/login', rea_order.login);
+app.post('/api/rea_order/demo-login', rea_order.demoLogin);
 app.post('/api/rea_order/verify', rea_order.verify);
 app.get('/api/rea_order/user', TokenMiddleWare, rea_order.fetchUser);
 app.get('/api/rea_order/users/data', rea_order.fetchAllUsers);

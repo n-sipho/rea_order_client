@@ -4,7 +4,7 @@ import { socket } from '../global/socket-init';
 import _ from 'lodash';
 import { Redirect } from 'react-router-dom';
 import Auth from '../utils/Auth';
-import Axios from 'axios';
+import api from '../utils/api';
 
 export default class Orders extends React.Component {
     constructor() {
@@ -15,21 +15,25 @@ export default class Orders extends React.Component {
     }
 
     componentDidMount() {
-        try {
-            let config = {
-                headers: {
-                    'Authorization': `bearer:${Auth.getToken()}`
-                }
-            }
-            socket.emit('get orders');
-            socket.on('data', async () => {
-                Axios.get('/api/rea_order/get/active_order', config)
-                    .then(res => {
-                        this.setState({ ordersList: res.data.data });
-                    });
-            });
-        } catch (error) {
+        socket.on('data', this.loadOrders);
+        socket.emit('get orders');
+    }
 
+    componentWillUnmount() {
+        socket.removeListener('data', this.loadOrders);
+    }
+
+    loadOrders = async () => {
+        const config = {
+            headers: {
+                'Authorization': `bearer:${Auth.getToken()}`
+            }
+        };
+        try {
+            const response = await api.get('/get/active_order', config);
+            this.setState({ ordersList: response.data.data });
+        } catch (error) {
+            console.error('Failed to load user orders:', error);
         }
     }
 

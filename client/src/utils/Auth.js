@@ -1,4 +1,5 @@
-import Axios from "axios";
+
+import api from './api';
 
 const Auth = {
     isAuthenticated: false,
@@ -7,38 +8,42 @@ const Auth = {
 
     async check() {
         try {
-            let jwt = {
-                token: '',
-            };
-            jwt.token = window.localStorage.getItem('token');
             const getToken = window.localStorage.getItem('token');
-            console.log(jwt.token !== '');
-            console.log(getToken + " getting token");
-            if (jwt.token !== '') {
-                await Axios.post('/api/rea_order/verify', jwt)
-                    .then(res => {
-                        console.log(res);
-                        this.isAuthenticated = res.data.response;
-                        this.client_id = res.data.client_id;
-                        this.token = res.data.token;
-                    });
-            };
-        } catch (error) {
 
-        };
+            // No token found
+            if (!getToken) {
+                this.isAuthenticated = false;
+                this.client_id = 0;
+                this.token = '';
+                return;
+            }
+
+            const response = await api.post('/verify', { token: getToken });
+
+            this.isAuthenticated = response.data.response;
+            this.client_id = response.data.client_id;
+            this.token = response.data.token;
+
+        } catch (error) {
+            console.error('Authentication check failed:', error.response?.data || error.message);
+
+            this.isAuthenticated = false;
+            this.client_id = 0;
+            this.token = '';
+        }
     },
 
     getToken() {
         return this.token;
     },
+
     getAuth() {
         return this.isAuthenticated;
-        // return true
     },
+
     getClientId() {
         return this.client_id;
     }
-
 };
 
 export default Auth;

@@ -9,6 +9,7 @@ import Admin from './admin/Main';
 const Router = (props) => (
     <HashRouter>
         <Switch>
+            <Route exact path='/' render={() => <Redirect to='/login' />} />
             <Route exact path='/signup' component={createAccount} />
             <Route exact path='/login' component={Login} />
             <PrivateRoute exact path='/app' component={ReaOrderApp} />

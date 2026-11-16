@@ -15,18 +15,24 @@ export default class DividerExampleHorizontal extends React.Component {
     }
 
     getData = foodItems => {
-        if (foodItems.length !== 0) {
-            this.setState({ status: 'New orders received!' });
-            this.setState({ incoming: foodItems });
-        }
+        const incoming = foodItems || [];
+        this.setState({
+            status: incoming.length ? 'New orders received!' : 'No orders!',
+            incoming
+        });
     }
 
     changeData = () => socket.emit('ordered_data');
 
     componentDidMount() {
-        socket.emit('ordered_data');
         socket.on('get_data', this.getData);
         socket.on('change_data', this.changeData);
+        socket.emit('ordered_data');
+    }
+
+    componentWillUnmount() {
+        socket.removeListener('get_data', this.getData);
+        socket.removeListener('change_data', this.changeData);
     }
 
     ready = (e, { ready_id, ready_order }) => {
@@ -86,8 +92,8 @@ export default class DividerExampleHorizontal extends React.Component {
                 <Segment basic textAlign='center'>
                     <h3 style={{ color: 'rgb(117, 117, 117)', fontWeight: 300, fontSize: 30 }}>{this.state.status}</h3>
                 </Segment>
-                <div className='items newOrders'>
-                    <pre style={{ height: 250, overflowY: 'scroll' }}>{this.renderOrderedItems()}</pre>
+                <div className='items newOrders admin-orders-list'>
+                    {this.renderOrderedItems()}
                 </div>
             </div>
         );

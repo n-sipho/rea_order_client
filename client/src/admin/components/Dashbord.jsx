@@ -4,22 +4,30 @@ import StockTable from './StockTable';
 import ClientTable from './ClientTable';
 import ActiveOrders from './ActiveOrders';
 import UpdateStockForm from './UpdateStockForm';
+import './Dashbord.css';
 
 class Dashbord extends Component {
     constructor() {
         super();
         this.state = {
             activeItem: 'Stock',
-            open: false
+            open: false,
+            mobileMenuOpen: false
         };
     };
 
-
-    handleItemClick = (e, { name }) => this.setState({ activeItem: name });
+    handleItemClick = (e, { name }) => this.setState({
+        activeItem: name,
+        mobileMenuOpen: false
+    });
 
     open = () => this.setState({ open: true });
 
     close = () => this.setState({ open: false });
+
+    toggleMobileMenu = () => this.setState(({ mobileMenuOpen }) => ({
+        mobileMenuOpen: !mobileMenuOpen
+    }));
 
     renderHtmlContent = (active) => {
         let content;
@@ -71,7 +79,7 @@ class Dashbord extends Component {
     renderMenu = () => {
         const { activeItem } = this.state;
         return (
-            <Menu vertical>
+            <Menu id='admin-dashboard-menu' vertical className='admin-dashboard__menu'>
                 <Menu.Item>
                     <Menu.Header>Products</Menu.Header>
                     <Menu.Menu>
@@ -122,7 +130,7 @@ class Dashbord extends Component {
     renderUpdateStockModal = () => {
         const { open } = this.state;
         return (
-            <Modal open={open}>
+            <Modal open={open} size='small'>
                 <Modal.Header>Add stock</Modal.Header>
                 <Modal.Content scrolling><UpdateStockForm /></Modal.Content>
                 <Modal.Actions><Button secondary floated='right' compact onClick={this.close} labelPosition='right' icon='x' content='Close' /></Modal.Actions>
@@ -131,34 +139,50 @@ class Dashbord extends Component {
     }
 
     render() {
-        const { activeItem } = this.state;
+        const { activeItem, mobileMenuOpen } = this.state;
         return (
-            <div>
-                <div className='container-fluid'>
-                    <div className='row'>
-                        <nav className='col-md-2 d-none d-md-block'>
-                            <div className='sidebar-sticky'>
-                                {this.renderMenu()}
-                            </div>
-                        </nav>
-                        <main role='main' className='col-md-9 ml-sm-auto col-lg-10 pt-3 px-4' >
-                            <div className='d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom'>
-                                <h1 style={{ color: 'rgb(117, 117, 117)', fontWeight: 300, fontSize: 40 }} className='h2'>Dashbord <Icon name='dashboard' /> </h1>
-                                <div className='btn-toolbar mb-2 mb-md-0'>
-                                    <div className='btn-group mr-2'>
-                                        <Button attached='left' secondary basic onClick={this.open}>Add stock</Button>
-                                        {/* <Button attached='right' secondary basic></Button> */}
-                                    </div>
-                                    {/* <Button content='This week' basic secondary className='btn btn-sm btn-outline-secondary dropdown-toggle' ></Button> */}
-                                </div>
-                            </div>
-                            <h2 style={{ color: 'rgb(117, 117, 117)', fontWeight: 300, fontSize: 30 }} className='h2'>{activeItem}</h2>
-                            <div className=''>
-                                {this.renderHtmlContent(activeItem)}
-                            </div>
-                        </main>
+            <div className='admin-dashboard'>
+                {mobileMenuOpen && (
+                    <button
+                        type='button'
+                        className='admin-dashboard__backdrop'
+                        aria-label='Close dashboard menu'
+                        onClick={this.toggleMobileMenu}
+                    />
+                )}
+                <aside
+                    className={`admin-dashboard__sidebar${mobileMenuOpen ? ' is-open' : ''}`}
+                    aria-label='Admin dashboard navigation'
+                >
+                    <button
+                        type='button'
+                        className='admin-dashboard__menu-close'
+                        onClick={this.toggleMobileMenu}
+                    >
+                        <Icon name='close' /> Close menu
+                    </button>
+                    {this.renderMenu()}
+                </aside>
+                <main className='admin-dashboard__main'>
+                    <header className='admin-dashboard__header'>
+                        <button
+                            type='button'
+                            className='admin-dashboard__menu-toggle'
+                            aria-label={`${mobileMenuOpen ? 'Close' : 'Open'} dashboard menu`}
+                            aria-controls='admin-dashboard-menu'
+                            aria-expanded={mobileMenuOpen}
+                            onClick={this.toggleMobileMenu}
+                        >
+                            <Icon name={mobileMenuOpen ? 'close' : 'bars'} />
+                        </button>
+                        <h1 className='admin-dashboard__title'>Dashboard <Icon name='dashboard' /></h1>
+                        <Button secondary basic onClick={this.open}>Add stock</Button>
+                    </header>
+                    <h2 className='admin-dashboard__section-title'>{activeItem}</h2>
+                    <div className='admin-dashboard__content'>
+                        {this.renderHtmlContent(activeItem)}
                     </div>
-                </div>
+                </main>
                 {this.renderUpdateStockModal()}
             </div>
         )

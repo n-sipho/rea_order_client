@@ -1,7 +1,7 @@
 import React from 'react';
 import Auth from '../utils/Auth';
 import { Card, Button, Modal, Icon, Message } from 'semantic-ui-react';
-import axios from 'axios';
+import api from '../utils/api';
 const Calculations = require('../functions/Calculations');
 const PlaceOrders = require('../functions/PlaceOrders');
 
@@ -31,7 +31,7 @@ export default class Home extends React.Component {
             const params = { id: id };
             if (id) {
                 this.setState({ open: true });
-                await axios.post('/api/rea_order/get_order', params)
+                await api.post('/get_order', params)
                     .then(res => {
                         let data = res.data.data;
                         calculations.init(Number(data.price), res.data.data.qty);
@@ -111,7 +111,7 @@ export default class Home extends React.Component {
 
     async componentDidMount() {
         try {
-            await axios.get('/api/rea_order/all')
+            await api.get('/all')
                 .then(response => {
                     let results = response.data;
                     let data = results.data;

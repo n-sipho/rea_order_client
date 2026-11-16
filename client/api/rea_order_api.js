@@ -1,7 +1,9 @@
 const bcrypt = require('bcrypt');
+const crypto = require('crypto');
 const saltRounds = 10;
 
 module.exports = (dbQueries, tokenHandler) => {
+    let demoUserId;
 
     const getStock = async (req, res) => {
         try {
@@ -109,6 +111,35 @@ module.exports = (dbQueries, tokenHandler) => {
 
     }
 
+    const demoLogin = async (req, res) => {
+        if (process.env.DEMO_MODE !== 'true') {
+            return res.status(404).json({
+                status: 'unavailable',
+                message: 'Demo access is not enabled.'
+            });
+        }
+
+        try {
+            if (!demoUserId) {
+                demoUserId = await dbQueries.getOrCreateDemoUser(() => {
+                    const password = crypto.randomBytes(32).toString('hex');
+                    return bcrypt.hash(password, saltRounds);
+                });
+            }
+            res.json({
+                status: 'success',
+                data: true,
+                token: tokenHandler.access(demoUserId)
+            });
+        } catch (error) {
+            console.error('Demo login failed:', error.message);
+            res.status(500).json({
+                status: 'error',
+                message: 'Demo access is temporarily unavailable.'
+            });
+        }
+    }
+
     const verify = async (req, res) => {
         try {
             const { token } = req.body;
@@ -201,6 +232,7 @@ module.exports = (dbQueries, tokenHandler) => {
         order: getOrder,
         create: CreateAccount,
         login,
+        demoLogin,
         verify,
         fetchUser,
         fetchAllUsers,

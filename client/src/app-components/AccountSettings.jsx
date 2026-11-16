@@ -1,6 +1,6 @@
 import React from 'react';
 import { Header, Image, Button, Grid, Form, Segment, Label } from 'semantic-ui-react';
-import Axios from 'axios';
+import api from '../utils/api';
 import Auth from '../utils/Auth';
 
 class AccountSettings extends React.Component {
@@ -18,7 +18,7 @@ class AccountSettings extends React.Component {
       }
     };
     try {
-      await Axios.get('/api/rea_order/user', config)
+      await api.get('/user', config)
         .then(res => {
           this.setState({ user: res.data.data });
         });
