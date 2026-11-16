@@ -7,8 +7,8 @@ import HomeIcon from '@mui/icons-material/Home';
 import Paper from '@mui/material/Paper';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import LocalMallIcon from '@mui/icons-material/LocalMall';
-import Home from '../main/Home';
-import Orders from '../main/Orders';
+import Home from '../main/home';
+import Orders from '../main/orders';
 import Carts from '../main/Carts';
 
 
